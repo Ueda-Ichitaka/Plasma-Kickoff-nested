@@ -18,7 +18,9 @@
  ***************************************************************************/
 
 #include "kickerplugin.h"
+#include "abstractmodel.h"
 #include "draghelper.h"
+#include "funnelmodel.h"
 #include "processrunner.h"
 #include "rootmodel.h"
 #include "runnermodel.h"
@@ -31,7 +33,10 @@ void KickerPlugin::registerTypes(const char *uri)
 {
     Q_ASSERT(uri == QLatin1String("org.kde.plasma.private.kicker"));
 
+    qmlRegisterType<AbstractModel>();
+
     qmlRegisterType<DragHelper>(uri, 0, 1, "DragHelper");
+    qmlRegisterType<FunnelModel>(uri, 0, 1, "FunnelModel");
     qmlRegisterType<ProcessRunner>(uri, 0, 1, "ProcessRunner");
     qmlRegisterType<RootModel>(uri, 0, 1, "RootModel");
     qmlRegisterType<RunnerModel>(uri, 0, 1, "RunnerModel");
