@@ -20,6 +20,7 @@ import org.kde.ksvg as KSvg
 import org.kde.plasma.components as PC3
 import org.kde.plasma.private.kicker as Kicker
 import org.kde.kirigami as Kirigami
+import kickoffnested.kickerparts as KickerParts
 
 import "code/tools.js" as Tools
 import "code/nested.js" as Nested
@@ -117,6 +118,19 @@ PlasmoidItem {
         id: frequentUsageModel
         favoritesModel: kickoff.rootModel.favoritesModel
         ordering: 1 // Popular / Frequently Used
+    }
+    //END
+
+    //BEGIN Kicker subfolder flyouts
+    // Kicker's flyout components look up an object with the id `kicker`
+    // (expanded, reset) and a root property itemListDialogComponent.
+    KickerParts.KickerBridge {
+        id: kicker
+        expanded: kickoff.expanded
+    }
+
+    readonly property Component itemListDialogComponent: Component {
+        KickerParts.ItemListDialog {}
     }
     //END
 

@@ -48,3 +48,12 @@ Folders appear but do not open yet; that comes with step 4.
 | 2.5 | Click a folder | Nothing happens, no error in the journal |
 | 2.6 | Search "nmap" | Found and starts as before |
 | 2.7 | Journal | No QML errors from `local.kickoffnested` (e.g. about `Nested` or `onRefreshed`) |
+
+## Step 3 - Bridge and Kicker parts
+
+Nothing visible changes; the flyout plumbing is in place for step 4.
+
+| # | Check | Expected |
+|---|---|---|
+| 3.1 | Open and close the launcher a few times, browse BlackArch | Same as after step 2 |
+| 3.2 | Journal while doing 3.1 | No errors mentioning `kicker`, `KickerBridge`, `KickerParts` or `itemListDialogComponent` |

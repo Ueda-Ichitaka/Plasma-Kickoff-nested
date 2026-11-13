@@ -112,24 +112,20 @@ same name.
 
 ### 4.3 Bridge object in Kickoff
 
-Kickoff's `main.qml` gets a small object that provides what the Kicker
-files look up by name:
+Kicker's flyout files expect two names from their applet:
 
-```qml
-QtObject {
-    id: kicker
-    readonly property bool expanded: kickoff.expanded
-    signal reset
-    readonly property Component itemListDialogComponent: Component {
-        KickerParts.ItemListDialog {}
-    }
-}
-```
+- `kicker`, an object with `expanded` and a `reset` signal. Provided by
+  `src/KickerBridge.qml` (part of the kickerparts module), instantiated in
+  Kickoff's `main.qml` as `KickerParts.KickerBridge { id: kicker; expanded: kickoff.expanded }`.
+  Like Kicker's `main.qml`, it emits `reset` whenever the launcher collapses.
+- `itemListDialogComponent`, looked up unqualified. QML resolves such names
+  on the root objects of the creating contexts, so it is a property of
+  Kickoff's root object, as in Kicker:
+  `readonly property Component itemListDialogComponent: Component { KickerParts.ItemListDialog {} }`.
 
-`reset` is emitted when Kickoff collapses, so open flyouts close and their
-models reset. `ItemListView` refers to `itemListDialogComponent` without a
-prefix; whether that resolves through the bridge or needs a root-level
-property on `kickoff` is checked in step 1 (section 7, R2).
+Both lookups are covered by `tests/tst_kickerbridge.qml`, which opens a real
+flyout from Kicker's `AppsModel` over the installed menu; copies of the test
+without either name fail with "is not defined".
 
 ### 4.4 Changes to Kickoff
 
@@ -159,6 +155,7 @@ possible.
 
 ```
 CMakeLists.txt              top level: find_package ECM, Qt6, KF6, Plasma; adds the two targets
+src/                        own QML used by the kickerparts module (KickerBridge.qml)
 cmake/KickerParts.cmake     ecm_add_qml_module for kickoffnested.kickerparts from applets/kicker/
 applets/kickoff/            the applet (modified in place)
 applets/kicker/             upstream Kicker, only the files listed in 4.2 are built
@@ -209,8 +206,11 @@ Done when: the widget runs, the smoke test passes, kickerparts loads.
 
 ### Step 3 - Bridge and Kicker parts
 
-1. Test first: bridge `expanded` follows `kickoff.expanded`; collapsing emits `reset`.
-2. Bridge object (4.3); kickerparts import in Kickoff.
+1. Test first (`tests/tst_kickerbridge.qml`): collapsing emits `reset`,
+   expanding does not; a folder row of Kicker's `ItemListView` over the real
+   menu opens a flyout through the bridge and `itemListDialogComponent`.
+2. Bridge (4.3) in `src/KickerBridge.qml`; kickerparts import, bridge and
+   `itemListDialogComponent` in Kickoff's `main.qml`.
 3. Manual: no QML warnings about `kicker` or `itemListDialogComponent` in the
    journal (`journalctl --user -f -t plasmashell`).
 
@@ -297,7 +297,7 @@ executed in a running Plasma session after `makepkg -si` and
 | Build tools installed (`cmake` 4.4.5, `extra-cmake-modules` 6.31.0) | ✅ |
 | 1 Build spike | ✅ |
 | 2 Nesting on | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
-| 3 Bridge and Kicker parts | ❌ |
+| 3 Bridge and Kicker parts | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
 | 4 Flyouts in list mode | ❌ |
 | 5 Flyouts in grid mode | ❌ |
 | 6 Keyboard | ❌ |

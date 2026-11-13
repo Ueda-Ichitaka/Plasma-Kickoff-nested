@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: MIT
 
 pkgname=kickoff-nested
-pkgver=6.8.2.r2.e0298b7
+pkgver=6.8.2.r3.b571a95
 pkgrel=1
 pkgdesc='Plasma Application Launcher (Kickoff) with Kicker-style nested subfolders'
 arch=('x86_64')
