@@ -1,0 +1,24 @@
+# Build output of the standalone CMake build and of tests
+/build/
+/build-*/
+Testing/
+compile_commands.json
+
+# makepkg output in packaging/
+/packaging/src/
+/packaging/pkg/
+/packaging/*.pkg.tar.*
+/packaging/*.log
+/packaging/plasma-desktop/
+
+# Temporary clones made by scripts/update-upstream.sh
+/.upstream/
+
+# Editors and tools
+.qmlls.ini
+.cache/
+.vscode/
+.idea/
+*.user
+*.swp
+*~
