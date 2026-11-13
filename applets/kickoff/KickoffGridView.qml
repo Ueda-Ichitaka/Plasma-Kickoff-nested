@@ -88,6 +88,7 @@ EmptyPage {
         // Opens Kicker-style flyouts for folder tiles; used by AbstractKickoffItemDelegate
         readonly property KickerParts.NestedFlyout nestedFlyout: KickerParts.NestedFlyout {
             view: view
+            mainSearchField: kickoff.searchField
             onInteractionConcluded: {
                 if (kickoff.hideOnWindowDeactivate) {
                     kickoff.expanded = false;
@@ -253,8 +254,11 @@ EmptyPage {
             let atBottom = currentIndex >= count - columns
             // Implements the keyboard navigation described in https://www.w3.org/TR/wai-aria-practices-1.2/#grid
             if (count > 0 && (event.key == Qt.Key_Return || event.key == Qt.Key_Enter)) {
-                (root.currentItem as AbstractKickoffItemDelegate).action.triggered();
-                root.currentItem.forceActiveFocus(Qt.ShortcutFocusReason);
+                // Folder tiles open their flyout; the arrow keys keep moving between tiles
+                if (!view.nestedFlyout.openWithKey(event.key, false)) {
+                    (root.currentItem as AbstractKickoffItemDelegate).action.triggered();
+                    root.currentItem.forceActiveFocus(Qt.ShortcutFocusReason);
+                }
                 event.accepted = true;
             } else if (count > 1) {
                 switch (event.key) {

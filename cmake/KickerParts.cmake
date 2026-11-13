@@ -4,8 +4,8 @@
 # singleton and code/tools.js apart from Kickoff's files of the same name.
 # The module also holds our own src/ files: KickerBridge.qml, which provides
 # the `kicker` object those components expect, and NestedFlyout.qml with
-# flyout.js, which open the flyouts from Kickoff's app views. Included from
-# the top-level CMakeLists.txt.
+# NestedFlyoutDialog.qml and flyout.js, which open the flyouts from Kickoff's
+# app views. Included from the top-level CMakeLists.txt.
 #
 # SPDX-FileCopyrightText: 2026 Ueda-Ichitaka
 # SPDX-License-Identifier: MIT
@@ -28,6 +28,7 @@ ecm_target_qml_sources(kickoffnested_kickerparts SOURCES "${KICKER_DIR}/code/too
 ecm_target_qml_sources(kickoffnested_kickerparts SOURCES
     "${CMAKE_SOURCE_DIR}/src/KickerBridge.qml"
     "${CMAKE_SOURCE_DIR}/src/NestedFlyout.qml"
+    "${CMAKE_SOURCE_DIR}/src/NestedFlyoutDialog.qml"
     "${CMAKE_SOURCE_DIR}/src/flyout.js"
 )
 

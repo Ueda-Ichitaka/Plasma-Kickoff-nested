@@ -92,6 +92,7 @@ EmptyPage {
         // Opens Kicker-style flyouts for folder rows; used by AbstractKickoffItemDelegate
         readonly property KickerParts.NestedFlyout nestedFlyout: KickerParts.NestedFlyout {
             view: view
+            mainSearchField: kickoff.searchField
             onInteractionConcluded: {
                 if (kickoff.hideOnWindowDeactivate) {
                     kickoff.expanded = false;
@@ -335,9 +336,22 @@ EmptyPage {
                         currentIndex = Math.min(targetIndex, count - 1)
                         focusCurrentItem(event, Qt.TabFocusReason)
                     } break
+                    case Qt.Key_Left:
+                        /* Fall through*/
+                    case Qt.Key_Right:
+                        // Arrow pointing the way the flyout opens opens a folder;
+                        // otherwise the key goes on to BasePage (sidebar switch)
+                        if (view.nestedFlyout.openWithKey(event.key, true)) {
+                            event.accepted = true
+                        }
+                        break
                     case Qt.Key_Return:
                         /* Fall through*/
                     case Qt.Key_Enter:
+                        if (view.nestedFlyout.openWithKey(event.key, true)) {
+                            event.accepted = true
+                            break
+                        }
                         if (launchMatchTimer.running) {
                             launchMatchTimer.stop()
                             launchMatchTimer.triggered()

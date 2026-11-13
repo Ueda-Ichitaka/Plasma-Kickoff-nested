@@ -26,7 +26,8 @@ Kickoff is not modified.
 
 | Topic | Decision |
 |---|---|
-| Opening a folder | Hover (100 ms) + click + Right/Enter |
+| Opening a folder | Hover (100 ms) + click + Enter; Right (away from the sidebar) in list mode |
+| Escape in a flyout | Closes flyouts and launcher, as in Kicker (Kicker's files stay unmodified); Left goes back one level |
 | Display modes | List and grid |
 | Scope | All categories (`flat: false` for the whole root model) |
 | Build | Compiled applet (`plasma_add_applet`), like the system Kickoff |
@@ -165,7 +166,7 @@ No placement code of our own is needed.
 
 ```
 CMakeLists.txt              top level: find_package ECM, Qt6, KF6, Plasma; adds the two targets
-src/                        own QML used by the kickerparts module (KickerBridge.qml)
+src/                        own QML used by the kickerparts module (KickerBridge, NestedFlyout, NestedFlyoutDialog, flyout.js)
 cmake/KickerParts.cmake     ecm_add_qml_module for kickoffnested.kickerparts from applets/kicker/
 applets/kickoff/            the applet (modified in place)
 applets/kicker/             upstream Kicker, only the files listed in 4.2 are built
@@ -246,11 +247,22 @@ Done when: the widget runs, the smoke test passes, kickerparts loads.
 
 ### Step 6 - Keyboard
 
-1. Test first: key mapping function (Right/Enter open, Left/Esc back,
-   mirrored in RTL).
-2. Key handling in both views; Kicker's `ItemListView` already handles keys
-   inside flyouts.
-3. Manual: full keyboard walk `BlackArch > Scanner > nmap > Enter`.
+1. Test first: `isOpenKey` in `src/flyout.js` (the arrow pointing the way
+   the flyout opens; mirrored with the content area), `openWithKey`,
+   keyboard focus into the flyout with its first entry selected, and focus
+   back to the folder row when the flyout closes itself
+   (`tests/tst_flyout.qml`, `tests/tst_nestedflyout.qml`).
+2. List: Enter and the open arrow on a folder call
+   `nestedFlyout.openWithKey()`; other Left/Right presses still reach
+   `BasePage` (sidebar switch). Kickoff mirrors its content area when the
+   sidebar is on the right, and Kicker's flyout follows that mirroring, so
+   the open arrow always points away from the sidebar. Grid: Enter only,
+   the arrows keep moving between tiles.
+3. Inside flyouts Kicker's `ItemListView` handles Up/Down, Right (deeper),
+   Left (closes that flyout) and Escape (closes everything). Left on the
+   first level destroys the flyout without a signal; `src/NestedFlyoutDialog.qml`
+   adds a `closing` signal so `NestedFlyout` returns focus to the row.
+4. Manual: full keyboard walk `BlackArch > Scanner > nmap > Enter`.
 
 ### Step 7 - Setting and polish
 
@@ -317,6 +329,6 @@ executed in a running Plasma session after `makepkg -si` and
 | 3 Bridge and Kicker parts | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
 | 4 Flyouts in list mode | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
 | 5 Flyouts in grid mode | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
-| 6 Keyboard | ❌ |
+| 6 Keyboard | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
 | 7 Setting and polish | ❌ |
 | 8 Maintenance tooling | ❌ |

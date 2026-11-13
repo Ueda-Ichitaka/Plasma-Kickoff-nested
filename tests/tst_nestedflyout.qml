@@ -273,4 +273,82 @@ TestCase {
         view.flyout.openCurrent();
         compare(view.flyout.childDialog.visualParent, view.currentItem);
     }
+
+    // Keyboard opening moves into the flyout and selects its first entry,
+    // like Kicker; mouse opening leaves the selection to the mouse.
+    function test_keyboard_open_selects_first_flyout_entry() {
+        const view = createView();
+        view.currentIndex = folderRow;
+        view.flyout.openCurrent(true);
+        verify(view.flyout.childDialog !== null);
+        compare(view.flyout.childDialog.mainItem.currentIndex, 0);
+    }
+
+    function test_mouse_open_selects_nothing_in_flyout() {
+        const view = createView();
+        view.currentIndex = folderRow;
+        view.flyout.openCurrent();
+        verify(view.flyout.childDialog !== null);
+        compare(view.flyout.childDialog.mainItem.currentIndex, -1);
+    }
+
+    function test_keyboard_open_of_hovered_flyout_selects_first_entry() {
+        const view = createView();
+        view.currentIndex = folderRow;
+        view.flyout.openCurrent();
+        const dialog = view.flyout.childDialog;
+        view.flyout.openCurrent(true);
+        compare(view.flyout.childDialog, dialog);
+        compare(dialog.mainItem.currentIndex, 0);
+    }
+
+    // Kickoff's key handlers ask the controller whether a key opens the
+    // current folder: Enter always, the arrow pointing the way the flyout
+    // opens only where arrows are free (list, not grid).
+    function test_openWithKey_data() {
+        return [
+            { tag: "right on folder", row: "folder", key: Qt.Key_Right, arrows: true, handled: true },
+            { tag: "left on folder", row: "folder", key: Qt.Key_Left, arrows: true, handled: false },
+            { tag: "return on folder", row: "folder", key: Qt.Key_Return, arrows: true, handled: true },
+            { tag: "enter on folder", row: "folder", key: Qt.Key_Enter, arrows: true, handled: true },
+            { tag: "right on app", row: "app", key: Qt.Key_Right, arrows: true, handled: false },
+            { tag: "return on app", row: "app", key: Qt.Key_Return, arrows: true, handled: false },
+            { tag: "right on folder, arrows off", row: "folder", key: Qt.Key_Right, arrows: false, handled: false },
+            { tag: "return on folder, arrows off", row: "folder", key: Qt.Key_Return, arrows: false, handled: true },
+        ];
+    }
+
+    function test_openWithKey(data) {
+        const view = createView();
+        view.currentIndex = data.row === "folder" ? folderRow : appRow;
+        compare(view.flyout.openWithKey(data.key, data.arrows), data.handled);
+        compare(view.flyout.childDialog !== null, data.handled);
+        if (data.handled) {
+            compare(view.flyout.childDialog.mainItem.currentIndex, 0);
+        }
+    }
+
+    // Left inside a flyout makes Kicker's ItemListView destroy that flyout
+    // (itemList.dialog.destroy()). The controller must let go of it and give
+    // the keyboard focus back to the folder row.
+    function test_flyout_closed_from_inside_returns_focus_to_row() {
+        const view = createView();
+        view.currentIndex = folderRow;
+        view.flyout.openCurrent(true);
+        verify(view.flyout.childDialog !== null);
+        view.flyout.childDialog.destroy();
+        tryVerify(() => view.flyout.childDialog === null);
+        tryVerify(() => view.currentItem.activeFocus);
+    }
+
+    function test_flyout_opens_again_after_closed_from_inside() {
+        const view = createView();
+        view.currentIndex = folderRow;
+        view.flyout.openCurrent(true);
+        view.flyout.childDialog.destroy();
+        tryVerify(() => view.flyout.childDialog === null);
+        view.flyout.openCurrent(true);
+        verify(view.flyout.childDialog !== null);
+        compare(view.flyout.childDialog.mainItem.currentIndex, 0);
+    }
 }

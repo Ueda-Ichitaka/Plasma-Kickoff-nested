@@ -98,3 +98,23 @@ applications as **grid**.
 While in steps 4 and 5, please save screenshots for the README:
 `docs/screenshots/list-flyout.png` (list mode, `BlackArch > Scanner` open)
 and `docs/screenshots/grid-flyout.png` (grid mode, flyout from a tile).
+
+## Step 6 - Keyboard
+
+Open the launcher with the Meta key, use only the keyboard.
+
+| # | Check | Expected |
+|---|---|---|
+| 6.1 | List mode: type nothing, Down to the sidebar, select BlackArch, Right into the app list | Focus on the first folder; no flyout opens by itself |
+| 6.2 | On a folder, press Right | Flyout opens, its first entry is selected |
+| 6.3 | Up/Down inside the flyout | Selection moves inside the flyout |
+| 6.4 | Left inside the flyout | Flyout closes, focus back on the folder row in Kickoff |
+| 6.5 | On a folder, press Enter | Flyout opens, its first entry is selected |
+| 6.6 | Select a tool in the flyout, press Enter | Tool starts; flyout and launcher close |
+| 6.7 | Flyout open, press Escape | Flyout and launcher close |
+| 6.8 | In the app list, press Left on any row | Focus moves to the sidebar, as in stock Kickoff |
+| 6.9 | Flyout open, type letters | Search field takes the input, as in Kicker |
+| 6.10 | Grid mode: arrow keys on folder tiles | Move between tiles; no flyout |
+| 6.11 | Grid mode: Enter on a folder tile | Flyout opens with first entry selected |
+| 6.12 | Settings: swap sidebar to the right, list mode, Left on a folder | Flyout opens to the left; Right goes to the sidebar |
+| 6.13 | Journal while doing 6.1 to 6.12 | No errors from `NestedFlyout`, `NestedFlyoutDialog` or `ItemListView` |

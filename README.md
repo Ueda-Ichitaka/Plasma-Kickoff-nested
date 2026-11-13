@@ -30,7 +30,8 @@ on.
 
 - Kickoff's layout, search, favorites, places and power buttons, unchanged
 - Subfolders in every category, opened as Kicker-style cascading flyouts
-- Opens on hover (100 ms), click, or Right/Enter; Left/Esc goes back
+- Opens on hover (100 ms), click, Enter, or Right in list mode; Left goes
+  back one level, Escape closes the launcher
 - Works in Kickoff's list and grid display modes
 - "Show subfolders" setting to switch back to Kickoff's flat behavior
 - Installs as a separate widget; the system Kickoff stays untouched
@@ -108,7 +109,10 @@ tried out through the package install above.
 ## Usage
 
 - Hover over a folder, or click it, to open its flyout; flyouts cascade
-- Keyboard: Up/Down move, Right/Enter open a folder, Left/Esc go back
+- Keyboard: Up/Down move; Enter, or Right in list mode, opens a folder and
+  moves into it; Left goes back one level; Escape closes the launcher (as in
+  Kicker). With the sidebar on the right (or right-to-left languages), Left
+  and Right swap.
 - Settings: right-click the launcher, **Configure Kickoff Nested...**,
   **Show subfolders**
 

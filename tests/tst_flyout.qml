@@ -3,7 +3,8 @@
     to an open subfolder flyout when the current row of a Kickoff app view
     changes: switch it to another folder reached with the mouse, close it
     otherwise. A current-row change never opens a flyout by itself; Kickoff
-    selects the first row of every category automatically.
+    selects the first row of every category automatically. Also tests which
+    arrow key opens a folder: the one pointing the way the flyout opens.
 
     SPDX-FileCopyrightText: 2026 Ueda-Ichitaka
     SPDX-License-Identifier: MIT
@@ -36,5 +37,19 @@ TestCase {
     function test_actions_are_distinct() {
         const actions = [Flyout.Nothing, Flyout.OpenDelayed, Flyout.Close];
         compare(new Set(actions).size, actions.length);
+    }
+
+    function test_isOpenKey_data() {
+        return [
+            { tag: "right, not mirrored", key: Qt.Key_Right, mirrored: false, expected: true },
+            { tag: "left, not mirrored", key: Qt.Key_Left, mirrored: false, expected: false },
+            { tag: "left, mirrored", key: Qt.Key_Left, mirrored: true, expected: true },
+            { tag: "right, mirrored", key: Qt.Key_Right, mirrored: true, expected: false },
+            { tag: "down", key: Qt.Key_Down, mirrored: false, expected: false },
+        ];
+    }
+
+    function test_isOpenKey(data) {
+        compare(Flyout.isOpenKey(data.key, data.mirrored), data.expected);
     }
 }
