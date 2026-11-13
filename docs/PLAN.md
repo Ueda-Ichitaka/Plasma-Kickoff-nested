@@ -254,6 +254,10 @@ Done when: the widget runs, the smoke test passes, kickerparts loads.
 
 ### Automated
 
+Run with `ctest --test-dir build --output-on-failure`. The build uses Qt 6's
+`qmltestrunner` (`/usr/lib/qt6/bin/qmltestrunner`); the `qmltestrunner` on
+the PATH belongs to Qt 5 (`qt5-declarative`) and cannot load these tests.
+
 - `qmltestrunner` tests in `tests/`, run through `ctest` with the build
   directory's QML import path.
 - Logic that decides behavior lives in `applets/kickoff/code/nested.js`
@@ -275,8 +279,8 @@ executed in a running Plasma session after `makepkg -si` and
 | Id | Risk / question | Check | Fallback |
 |---|---|---|---|
 | R1 | Kickoff's popup may close when a flyout window takes focus. Kicker's QML does nothing special; the handling is assumed to be in `PlasmaQuick::Dialog` (flyout is a transient child of the popup). | Step 4, first thing | Open folders inside the right pane with a back button instead of flyouts |
-| R2 | Unqualified `kicker` / `itemListDialogComponent` lookups from a second QML module may not resolve through the context chain under `pragma ComponentBehavior: Bound` and compiled QML. | Step 1 test | Copy the Kicker files into Kickoff with explicit properties instead of globals |
-| R3 | Building Kicker's files outside their original module (`plasma.applet.org.kde.plasma.kicker`) may need adjustments, e.g. `Plasmoid` attached object resolution. | Step 1 | Same as R2 |
+| R2 | ✅ test-level: `tst_kickerparts` resolves `kicker` through the creating context; a copy with the id renamed fails with `kicker is not defined`. Unqualified `kicker` / `itemListDialogComponent` lookups from a second QML module may not resolve through the context chain under `pragma ComponentBehavior: Bound` and compiled QML. | Step 1 test | Copy the Kicker files into Kickoff with explicit properties instead of globals |
+| R3 | ✅ all Kicker parts compile and load as `kickoffnested.kickerparts`. Building Kicker's files outside their original module (`plasma.applet.org.kde.plasma.kicker`) may need adjustments, e.g. `Plasmoid` attached object resolution. | Step 1 | Same as R2 |
 | R4 | Translations: with a new plugin id the translation domain changes, so Kickoff's existing `.mo` files are not used. | Step 1 | Set the domain explicitly to `plasma_applet_org.kde.plasma.kickoff` if libplasma allows it, else English strings |
 | R5 | Plasma updates: the compiled applet is built against Plasma 6.8.2. | Each Plasma upgrade | Rebuild with `makepkg -si`; step 8 adds a reminder hook |
 
@@ -286,7 +290,7 @@ executed in a running Plasma session after `makepkg -si` and
 |---|---|
 | Repository filtered and on `v6.8.2` | ✅ |
 | Build tools installed (`cmake` 4.4.5, `extra-cmake-modules` 6.31.0) | ✅ |
-| 1 Build spike | ❌ |
+| 1 Build spike | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
 | 2 Nesting on | ❌ |
 | 3 Bridge and Kicker parts | ❌ |
 | 4 Flyouts in list mode | ❌ |

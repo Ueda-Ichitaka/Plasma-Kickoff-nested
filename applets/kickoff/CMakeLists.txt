@@ -1,6 +1,6 @@
 set_source_files_properties(KickoffSingleton.qml ActionMenu.qml PROPERTIES QT_QML_SINGLETON_TYPE TRUE)
 
-plasma_add_applet(org.kde.plasma.kickoff
+plasma_add_applet(local.kickoffnested
 QML_SOURCES
     config.qml
     main.xml
@@ -35,4 +35,4 @@ RESOURCES
 GENERATE_APPLET_CLASS
 )
 
-ecm_target_qml_sources(org.kde.plasma.kickoff SOURCES code/tools.js PATH code)
+ecm_target_qml_sources(local.kickoffnested SOURCES code/tools.js PATH code)

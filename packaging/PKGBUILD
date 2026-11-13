@@ -1,0 +1,53 @@
+# About: builds Kickoff Nested from this repository's working tree (including
+# uncommitted changes) and packages it for pacman: the applet plugin
+# local.kickoffnested and the Kicker parts QML module kickoffnested.kickerparts.
+# The applet is compiled against the installed Plasma 6.8, so the Plasma
+# dependencies are limited to 6.8.x; rebuild after a Plasma upgrade.
+# Usage: cd packaging && makepkg -si
+#
+# SPDX-FileCopyrightText: 2026 Ueda-Ichitaka
+# SPDX-License-Identifier: MIT
+
+pkgname=kickoff-nested
+pkgver=6.8.2.r1.7b5360e
+pkgrel=1
+pkgdesc='Plasma Application Launcher (Kickoff) with Kicker-style nested subfolders'
+arch=('x86_64')
+license=('GPL-2.0-or-later' 'MIT')
+depends=(
+  'libplasma>=6.8.2' 'libplasma<6.9'
+  'plasma-workspace>=6.8.2' 'plasma-workspace<6.9'
+  'plasma5support'
+  'kcmutils'
+  'kconfig'
+  'kcoreaddons'
+  'kiconthemes'
+  'kirigami'
+  'kirigami-addons'
+  'kitemmodels'
+  'ksvg'
+  'qt6-declarative'
+)
+makedepends=('cmake' 'extra-cmake-modules' 'ninja' 'git')
+
+_repo="$(realpath "${startdir}/..")"
+
+pkgver() {
+  git -C "${_repo}" describe --long --tags | sed 's/^v//;s/\([^-]*-\)g/r\1/;s/-/./g'
+}
+
+build() {
+  cmake -S "${_repo}" -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    -DCMAKE_INSTALL_PREFIX=/usr
+  cmake --build build
+}
+
+check() {
+  QT_QPA_PLATFORM=offscreen ctest --test-dir build --output-on-failure
+}
+
+package() {
+  DESTDIR="${pkgdir}" cmake --install build
+  install -Dm644 "${_repo}/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}

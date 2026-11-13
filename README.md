@@ -99,6 +99,9 @@ cmake --build build
 ctest --test-dir build --output-on-failure
 ```
 
+Run QML tests through `ctest`: it uses Qt 6's `qmltestrunner`, while the
+`qmltestrunner` on the PATH may be Qt 5's.
+
 Plasma loads applets only from its plugin path, so a development build is
 tried out through the package install above.
 
@@ -124,20 +127,23 @@ Details: [docs/PLAN.md](docs/PLAN.md).
 ## Repository layout
 
 ```
-applets/kickoff/   Kickoff (upstream plasma-desktop, modified)
-applets/kicker/    Kicker (upstream plasma-desktop, subfolder parts reused)
-docs/              plan, manual test checklist, screenshots
-LICENSES/          license texts referenced by the SPDX headers
-LICENSE            MIT license for the files written for this project
-.gitignore         build output, makepkg output, editor files
+CMakeLists.txt       standalone build of the applet and tests
+cmake/               Kicker parts QML module (kickoffnested.kickerparts)
+applets/kickoff/     Kickoff (upstream plasma-desktop, modified)
+applets/kicker/      Kicker (upstream plasma-desktop, subfolder parts reused)
+tests/               ctest tests (C++ and qmltestrunner)
+packaging/PKGBUILD   pacman package, built from the working tree
+docs/                plan, manual test checklist, screenshots
+LICENSES/            license texts referenced by the SPDX headers
+LICENSE              MIT license for the files written for this project
+.gitignore           build output, makepkg output, editor files
 ```
 
-Files added by later plan steps (`CMakeLists.txt`, `cmake/`, `tests/`,
-`packaging/`, `scripts/`) are listed in [docs/PLAN.md](docs/PLAN.md),
-section 4.6.
+`scripts/` (upstream update helpers) follows in plan step 8, see
+[docs/PLAN.md](docs/PLAN.md), section 4.6.
 
-The repository is plasma-desktop filtered to the paths above, with their
-full upstream history, based on tag `v6.8.2`.
+`applets/` and `LICENSES/` are plasma-desktop filtered to those paths, with
+their full upstream history, based on tag `v6.8.2`.
 
 ## Updating to a new Plasma release
 
