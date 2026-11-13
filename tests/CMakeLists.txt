@@ -5,7 +5,8 @@
 # build directory, tst_nested tests applets/kickoff/code/nested.js,
 # tst_kickerbridge opens a Kicker flyout through the Kickoff bridge,
 # tst_flyout tests src/flyout.js, tst_nestedflyout src/NestedFlyout.qml.
-# The menu-based tests use the fixed test menu in data/.
+# The menu-based tests use the fixed test menu in data/. The shell tests
+# cover the packaging and maintenance scripts.
 #
 # SPDX-FileCopyrightText: 2026 Ueda-Ichitaka
 # SPDX-License-Identifier: MIT
@@ -44,3 +45,9 @@ file(MAKE_DIRECTORY "${TEST_XDG_HOME}/config" "${TEST_XDG_HOME}/data" "${TEST_XD
 set_tests_properties(tst_kickerbridge tst_nestedflyout PROPERTIES ENVIRONMENT
     "XDG_MENU_PREFIX=test-;XDG_CONFIG_HOME=${TEST_XDG_HOME}/config;XDG_DATA_HOME=${TEST_XDG_HOME}/data;XDG_CACHE_HOME=${TEST_XDG_HOME}/cache;XDG_CONFIG_DIRS=${CMAKE_CURRENT_SOURCE_DIR}/data/xdg-config:/etc/xdg;XDG_DATA_DIRS=${CMAKE_CURRENT_SOURCE_DIR}/data/xdg-data:/usr/local/share:/usr/share"
 )
+
+# Shell script tests; each gets the path of the script it tests.
+add_test(NAME tst_plasma_check COMMAND bash "${CMAKE_CURRENT_SOURCE_DIR}/tst_plasma_check.sh" "${CMAKE_SOURCE_DIR}/packaging/plasma-check.sh")
+add_test(NAME tst_pkgver COMMAND bash "${CMAKE_CURRENT_SOURCE_DIR}/tst_pkgver.sh" "${CMAKE_SOURCE_DIR}/packaging/pkgver.sh")
+add_test(NAME tst_update_upstream COMMAND bash "${CMAKE_CURRENT_SOURCE_DIR}/tst_update_upstream.sh" "${CMAKE_SOURCE_DIR}/scripts/update-upstream.sh")
+

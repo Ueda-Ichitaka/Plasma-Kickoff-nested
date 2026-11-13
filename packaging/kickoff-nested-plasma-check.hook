@@ -1,0 +1,22 @@
+# About: pacman hook installed by kickoff-nested. After Plasma (or this
+# package) is installed or upgraded, it runs plasma-check, which warns when
+# the installed Plasma version differs from the upstream release the
+# launcher was built from, and says how to update the repository. It only
+# prints a note and never blocks the transaction.
+#
+# SPDX-FileCopyrightText: 2026 Ueda-Ichitaka
+# SPDX-License-Identifier: MIT
+
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = plasma-workspace
+Target = plasma-desktop
+Target = libplasma
+Target = kickoff-nested
+
+[Action]
+Description = Checking Kickoff Nested against the installed Plasma version...
+When = PostTransaction
+Exec = /usr/lib/kickoff-nested/plasma-check

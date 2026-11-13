@@ -73,9 +73,20 @@ choose **Show Alternatives...**, and select **Kickoff Nested**.
 
 ## Install
 
-### Package (recommended)
+### Release package
 
-`packaging/PKGBUILD` builds the applet and installs it as a pacman package:
+Each release on GitHub
+(https://github.com/Ueda-Ichitaka/Plasma-Kickoff-nested/releases) has the
+pacman package attached, built and tested by CI:
+
+```
+sudo pacman -U kickoff-nested-1.0.0-1-x86_64.pkg.tar.zst
+```
+
+### Package from source (recommended for development)
+
+`packaging/PKGBUILD` builds the applet from this working tree and installs it
+as a pacman package:
 
 ```
 cd packaging
@@ -84,6 +95,11 @@ makepkg -si
 
 - Installs the applet plugin to `/usr/lib/qt6/plugins/plasma/applets/`
 - Installs the Kicker parts QML module to `/usr/lib/qt6/qml/kickoffnested/`
+- Installs a pacman hook that, after Plasma upgrades, warns when the
+  installed Plasma differs from the release the launcher was built from
+  (`UPSTREAM_BASE`) and prints the update steps; it never blocks pacman
+- Requires Plasma from the base's minor version on (`>=6.8`), so system
+  upgrades are never held back
 - Remove with `sudo pacman -R kickoff-nested`
 
 Restart Plasma once after the first install so it picks up the new widget:
@@ -137,18 +153,38 @@ src/                 own QML for that module (bridge, flyout controller)
 applets/kickoff/     Kickoff (upstream plasma-desktop, modified)
 applets/kicker/      Kicker (upstream plasma-desktop, subfolder parts reused)
 tests/               ctest tests (C++ and qmltestrunner), fixed test menu in tests/data/
-packaging/PKGBUILD   pacman package, built from the working tree
+packaging/           PKGBUILD (built from the working tree), pkgver.sh,
+                     Plasma check pacman hook and its script
+scripts/             update-upstream.sh, upstream-diff.sh
+.github/workflows/   CI/CD: build and test on push, release on tag
+VERSION              release version of this project (1.0.0)
+UPSTREAM_BASE        KDE plasma-desktop release the fork is based on
 docs/                plan, manual test checklist, screenshots
 LICENSES/            license texts referenced by the SPDX headers
 LICENSE              MIT license for the files written for this project
 .gitignore           build output, makepkg output, editor files
 ```
 
-`scripts/` (upstream update helpers) follows in plan step 8, see
-[docs/PLAN.md](docs/PLAN.md), section 4.6.
-
 `applets/` and `LICENSES/` are plasma-desktop filtered to those paths, with
 their full upstream history, based on tag `v6.8.2`.
+
+## Versions and releases
+
+- `VERSION` holds the project's release version. A package built exactly on
+  the tag `v<VERSION>` (e.g. `v1.0.0`) gets that version; other builds get
+  `<VERSION>.r<commits>.g<hash>` (`packaging/pkgver.sh`).
+- CI (`.github/workflows/package.yml`) builds and tests the package on every
+  push and pull request and keeps it as a workflow artifact.
+- To release: set `VERSION`, commit, then push only the release tag:
+
+  ```
+  git tag -a v1.0.0 -m "Kickoff Nested 1.0.0"
+  git push origin v1.0.0
+  ```
+
+  CI publishes a GitHub Release with the package. Push tags one by one, not
+  with `git push --tags`: the history also contains the KDE release tags
+  (`v6.8.2`, ...), which must not be pushed and never create a release.
 
 ## Updating to a new Plasma release
 
@@ -158,13 +194,18 @@ The history was filtered with
 git filter-repo --path applets/kickoff --path applets/kicker --path LICENSES --preserve-commit-hashes
 ```
 
-which gives the same commit ids for the same upstream commits on every run.
-A new KDE release can therefore be filtered the same way and merged:
+which gives the same commit ids for the same upstream commits on every run,
+so a new KDE release can be filtered the same way and merged. When the
+pacman hook reports a new Plasma version (or for any release vX.Y.Z):
 
-1. Filter a fresh clone of https://invent.kde.org/plasma/plasma-desktop
-   with the command above (plan step 8 adds `scripts/update-upstream.sh`).
-2. Fetch the new tag from the filtered clone into this repository.
-3. `git merge <tag>`, resolve conflicts, rebuild, reinstall.
+```
+scripts/update-upstream.sh v6.8.3     # needs git-filter-repo; fetches the filtered tag
+scripts/upstream-diff.sh --stat       # this fork's changes to the KDE files
+git merge v6.8.3                      # resolve conflicts in applets/kickoff/
+echo v6.8.3 > UPSTREAM_BASE
+cmake --build build && ctest --test-dir build
+cd packaging && makepkg -si
+```
 
 ## License
 

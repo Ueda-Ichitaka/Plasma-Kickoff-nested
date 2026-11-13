@@ -132,3 +132,21 @@ Open the launcher with the Meta key, use only the keyboard.
 | 7.7 | Open a flyout, move onto an app row and rest there | Flyout closes after a short moment |
 | 7.8 | Open a flyout, press Down in the Kickoff list | Flyout closes at once |
 | 7.9 | Journal while doing 7.1 to 7.8 | No errors |
+
+## Step 8 - Maintenance tooling
+
+| # | Check | Expected |
+|---|---|---|
+| 8.1 | `cd packaging && makepkg -si` | Package version `1.0.0.r<n>.g<hash>`; pacman may warn about a downgrade from the earlier `6.8.2.r...` versions once, confirm it |
+| 8.2 | Output of 8.1 | Hook line "Checking Kickoff Nested against the installed Plasma version...", no warning (Plasma 6.8.2 installed) |
+| 8.3 | `/usr/lib/kickoff-nested/plasma-check /usr/share/kickoff-nested/upstream-base 6.8.3-1` | Warning with `scripts/update-upstream.sh v6.8.3` |
+| 8.4 | `scripts/upstream-diff.sh --stat` | Only `applets/kickoff/` files listed |
+| 8.5 | Next real Plasma upgrade (e.g. to 6.8.3) via `sudo pacman -Syu` | Hook prints the update steps after the transaction |
+
+## Step 9 - CI/CD
+
+| # | Check | Expected |
+|---|---|---|
+| 9.1 | Push a branch | GitHub Actions run "Package" succeeds; artifact `kickoff-nested-package` holds the `.pkg.tar.zst` |
+| 9.2 | `git tag -a v1.0.0 -m "Kickoff Nested 1.0.0" && git push origin v1.0.0` | Run succeeds and creates the release "Kickoff Nested 1.0.0" with the package |
+| 9.3 | Download the release package, `sudo pacman -U` it | Installs version `1.0.0-1` |

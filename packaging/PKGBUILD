@@ -1,22 +1,30 @@
 # About: builds Kickoff Nested from this repository's working tree (including
 # uncommitted changes) and packages it for pacman: the applet plugin
-# local.kickoffnested and the Kicker parts QML module kickoffnested.kickerparts.
-# The applet is compiled against the installed Plasma 6.8, so the Plasma
-# dependencies are limited to 6.8.x; rebuild after a Plasma upgrade.
+# local.kickoffnested, the Kicker parts QML module kickoffnested.kickerparts,
+# and a pacman hook that warns when an installed Plasma version differs from
+# the upstream release in UPSTREAM_BASE the package was built from. The
+# version comes from VERSION (see pkgver.sh). Plasma is required only from
+# the base's minor version on, so system upgrades are never blocked.
 # Usage: cd packaging && makepkg -si
 #
 # SPDX-FileCopyrightText: 2026 Ueda-Ichitaka
 # SPDX-License-Identifier: MIT
 
 pkgname=kickoff-nested
-pkgver=6.8.2.r4.3df204c
+pkgver=1.0.0.r1862.g088a710
 pkgrel=1
 pkgdesc='Plasma Application Launcher (Kickoff) with Kicker-style nested subfolders'
 arch=('x86_64')
 license=('GPL-2.0-or-later' 'MIT')
+
+_repo="$(realpath "${startdir}/..")"
+_base="$(<"${_repo}/UPSTREAM_BASE")"
+_plasma_minor="${_base#v}"
+_plasma_minor="${_plasma_minor%.*}"
+
 depends=(
-  'libplasma>=6.8.2' 'libplasma<6.9'
-  'plasma-workspace>=6.8.2' 'plasma-workspace<6.9'
+  "libplasma>=${_plasma_minor}"
+  "plasma-workspace>=${_plasma_minor}"
   'plasma5support'
   'kcmutils'
   'kconfig'
@@ -30,10 +38,8 @@ depends=(
 )
 makedepends=('cmake' 'extra-cmake-modules' 'ninja' 'git')
 
-_repo="$(realpath "${startdir}/..")"
-
 pkgver() {
-  git -C "${_repo}" describe --long --tags | sed 's/^v//;s/\([^-]*-\)g/r\1/;s/-/./g'
+  bash "${_repo}/packaging/pkgver.sh" "${_repo}"
 }
 
 build() {
@@ -50,4 +56,8 @@ check() {
 package() {
   DESTDIR="${pkgdir}" cmake --install build
   install -Dm644 "${_repo}/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+  install -Dm644 "${_repo}/UPSTREAM_BASE" "${pkgdir}/usr/share/kickoff-nested/upstream-base"
+  install -Dm755 "${_repo}/packaging/plasma-check.sh" "${pkgdir}/usr/lib/kickoff-nested/plasma-check"
+  install -Dm644 "${_repo}/packaging/kickoff-nested-plasma-check.hook" \
+    "${pkgdir}/usr/share/libalpm/hooks/kickoff-nested-plasma-check.hook"
 }

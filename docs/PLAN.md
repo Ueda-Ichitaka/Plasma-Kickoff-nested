@@ -171,8 +171,10 @@ cmake/KickerParts.cmake     ecm_add_qml_module for kickoffnested.kickerparts fro
 applets/kickoff/            the applet (modified in place)
 applets/kicker/             upstream Kicker, only the files listed in 4.2 are built
 tests/                      qmltestrunner tests
-packaging/PKGBUILD          builds and installs the pacman package
+packaging/                  PKGBUILD, pkgver.sh, Plasma check hook and script
 scripts/update-upstream.sh  re-filters a new KDE release and fetches its tag
+.github/workflows/          CI/CD: build and test on push, release on tag
+VERSION, UPSTREAM_BASE      project release version, KDE base release
 scripts/upstream-diff.sh    shows this fork's changes against the upstream tag
 docs/                       this plan, manual test checklist, screenshots
 ```
@@ -282,12 +284,39 @@ Done when: the widget runs, the smoke test passes, kickerparts loads.
 
 ### Step 8 - Maintenance tooling
 
-1. `scripts/update-upstream.sh <tag>`: temporary full clone from KDE,
-   `git filter-repo --path applets/kickoff --path applets/kicker --path LICENSES --preserve-commit-hashes`,
-   fetch the tag into this repo. The merge itself is done by hand.
-2. `scripts/upstream-diff.sh`: diff of `applets/` against the base tag.
-3. Optional pacman hook that reminds to rebuild after `plasma-desktop`,
-   `plasma-workspace` or `libplasma` upgrades.
+1. Test first (shell tests run by ctest): `tests/tst_plasma_check.sh`,
+   `tests/tst_pkgver.sh`, `tests/tst_update_upstream.sh` (argument checks).
+2. `UPSTREAM_BASE` (`v6.8.2`): single source of the KDE base release, read
+   by the scripts, the PKGBUILD and the hook.
+3. `scripts/update-upstream.sh vX.Y.Z`: clones plasma-desktop into
+   `.upstream/`, filters it with the same `git filter-repo` options, fetches
+   the tag; merging is left to the user. Verified with v6.8.3 in a scratch
+   clone: v6.8.2 is an ancestor of the fetched v6.8.3 and `git merge-tree`
+   reports a clean merge.
+4. `scripts/upstream-diff.sh [git diff options]`: this fork's changes to
+   `applets/` against `UPSTREAM_BASE`.
+5. Pacman hook `kickoff-nested-plasma-check.hook` (PostTransaction on
+   plasma-workspace, plasma-desktop, libplasma, kickoff-nested) runs
+   `/usr/lib/kickoff-nested/plasma-check`: compares the installed
+   plasma-workspace version with `/usr/share/kickoff-nested/upstream-base`
+   and prints the update steps when they differ. Never blocks pacman.
+6. Versioning: `VERSION` (1.0.0) and `packaging/pkgver.sh`; Plasma
+   dependencies loosened to `>=` the base's minor version (6.8).
+
+### Step 9 - CI/CD
+
+1. `.github/workflows/package.yml` (GitHub Actions, `archlinux:base-devel`
+   container): installs dependencies, checks out the full history, runs
+   `makepkg` as an unprivileged user (build plus all tests in `check()`),
+   uploads the package as artifact.
+2. On a pushed tag equal to `v<VERSION>`: `gh release create` with the
+   package attached and the Plasma base and build versions in the notes.
+   Other `v*` tags (KDE's) are ignored.
+3. Actions pinned to their current major versions: `actions/checkout@v7`
+   (v7.0.1), `actions/upload-artifact@v7` (v7.0.2); releases use the GitHub
+   CLI from the Arch repositories instead of a third-party action.
+4. Verified offline: workflow parses, release tag guard (v1.0.0 releases,
+   v6.8.2 does not). The first real run needs a push to GitHub.
 
 ## 6. Testing
 
@@ -340,4 +369,5 @@ executed in a running Plasma session after `makepkg -si` and
 | 5 Flyouts in grid mode | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
 | 6 Keyboard | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
 | 7 Setting and polish | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
-| 8 Maintenance tooling | ❌ |
+| 8 Maintenance tooling | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
+| 9 CI/CD | workflow written ✅, first GitHub run pending |
