@@ -34,3 +34,17 @@ the system launcher.
 | 1.7 | Right-click launcher, **Configure Kickoff Nested...** | Settings dialog opens, changes apply |
 | 1.8 | Journal while doing 1.1 to 1.7 | No QML errors from `local.kickoffnested` |
 | 1.9 | Switch back via **Show Alternatives...** to Application Launcher | System Kickoff works as before |
+
+## Step 2 - Nesting on
+
+Folders appear but do not open yet; that comes with step 4.
+
+| # | Check | Expected |
+|---|---|---|
+| 2.1 | Open the BlackArch category (list mode) | Category folders (Cracker, Scanner, ...) listed first, alphabetical, each with an arrow on the right; no flat tool list |
+| 2.2 | Sidebar | Categories have no arrow; order as in system Kickoff |
+| 2.3 | A category without subfolders (e.g. Office) | Same contents and order as in system Kickoff |
+| 2.4 | Settings: show applications as grid, open BlackArch | Folder tiles with a small arrow at the bottom right of the icon |
+| 2.5 | Click a folder | Nothing happens, no error in the journal |
+| 2.6 | Search "nmap" | Found and starts as before |
+| 2.7 | Journal | No QML errors from `local.kickoffnested` (e.g. about `Nested` or `onRefreshed`) |

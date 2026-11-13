@@ -197,10 +197,15 @@ Done when: the widget runs, the smoke test passes, kickerparts loads.
 
 ### Step 2 - Nesting on
 
-1. Test first: with a mock model containing a folder row, the list and grid
-   delegates expose `isFolder === true` and show the folder indicator.
-2. `flat: false` in `main.qml`; folder indicator in both delegates.
-3. Manual: BlackArch shows its category folders; nothing opens yet.
+1. Test first (`tests/tst_nested.qml`): `code/nested.js` recognizes folder
+   rows, shows the arrow only outside the sidebar, and applies stock sorting.
+2. `flat: false` in `main.qml`; folder arrow in both delegates.
+3. Sorting as stock Kickoff: `flat: true` forced alphabetical order without
+   separators only in categories with subfolders. On every root refresh,
+   `Nested.applyStockSorting()` sets `sorted: true` and
+   `showSeparators: false` on exactly those category models; the sidebar
+   and other categories keep following `alphaSort`.
+4. Manual: BlackArch shows its category folders; nothing opens yet.
 
 ### Step 3 - Bridge and Kicker parts
 
@@ -290,8 +295,8 @@ executed in a running Plasma session after `makepkg -si` and
 |---|---|
 | Repository filtered and on `v6.8.2` | ✅ |
 | Build tools installed (`cmake` 4.4.5, `extra-cmake-modules` 6.31.0) | ✅ |
-| 1 Build spike | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
-| 2 Nesting on | ❌ |
+| 1 Build spike | ✅ |
+| 2 Nesting on | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
 | 3 Bridge and Kicker parts | ❌ |
 | 4 Flyouts in list mode | ❌ |
 | 5 Flyouts in grid mode | ❌ |

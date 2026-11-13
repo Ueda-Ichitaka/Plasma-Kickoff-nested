@@ -35,4 +35,4 @@ RESOURCES
 GENERATE_APPLET_CLASS
 )
 
-ecm_target_qml_sources(local.kickoffnested SOURCES code/tools.js PATH code)
+ecm_target_qml_sources(local.kickoffnested SOURCES code/tools.js code/nested.js PATH code)

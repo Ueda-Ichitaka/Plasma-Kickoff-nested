@@ -17,6 +17,8 @@ import QtQuick.Layouts
 import org.kde.plasma.components as PC3
 import org.kde.kirigami as Kirigami
 
+import "code/nested.js" as Nested
+
 AbstractKickoffItemDelegate {
     id: root
 
@@ -60,6 +62,21 @@ AbstractKickoffItemDelegate {
                     type: Kirigami.Badge.Type.Positive
                     Accessible.name: i18nc("@label Accessible name for badge", "Newly-installed application")
                 }
+            }
+
+            Kirigami.Icon {
+                id: folderArrow
+                anchors {
+                    right: parent.right
+                    rightMargin: -root.rightPadding
+                    bottom: parent.bottom
+                }
+                width: Kirigami.Units.iconSizes.small
+                height: width
+
+                visible: Nested.showsFolderArrow(root.model, root.isCategoryListItem)
+                selected: root.iconAndLabelsShouldlookSelected
+                source: root.mirrored ? "go-next-rtl-symbolic" : "go-next-symbolic"
             }
         }
 

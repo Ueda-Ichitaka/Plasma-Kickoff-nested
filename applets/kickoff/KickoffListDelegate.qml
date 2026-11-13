@@ -19,6 +19,8 @@ import org.kde.plasma.components as PC3
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.plasmoid
 
+import "code/nested.js" as Nested
+
 AbstractKickoffItemDelegate {
     id: root
 
@@ -125,6 +127,18 @@ AbstractKickoffItemDelegate {
                     ? i18n("There is a newly-installed application in this category")
                     : i18n("Newly-installed application")
             }
+        }
+
+        Kirigami.Icon {
+            id: folderArrow
+            Layout.alignment: Qt.AlignVCenter
+            implicitWidth: visible ? Kirigami.Units.iconSizes.small : 0
+            implicitHeight: implicitWidth
+
+            visible: Nested.showsFolderArrow(root.model, root.isCategoryListItem)
+            opacity: root.view?.currentIndex === root.index ? 1.0 : 0.4
+            selected: root.iconAndLabelsShouldlookSelected
+            source: root.mirrored ? "go-next-rtl-symbolic" : "go-next-symbolic"
         }
     }
 

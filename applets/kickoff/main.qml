@@ -22,6 +22,7 @@ import org.kde.plasma.private.kicker as Kicker
 import org.kde.kirigami as Kirigami
 
 import "code/tools.js" as Tools
+import "code/nested.js" as Nested
 
 PlasmoidItem {
     id: kickoff
@@ -55,7 +56,7 @@ PlasmoidItem {
         appletInterface: kickoff
 
         appNameFormat: Plasmoid.configuration.appNameFormat
-        flat: true // have categories, but no subcategories
+        flat: false // have categories with subfolders, shown as Kicker-style flyouts
         sorted: Plasmoid.configuration.alphaSort
         showSeparators: !sorted && Plasmoid.configuration.applicationsDisplay != 0
         showRootSeparator: true
@@ -79,6 +80,9 @@ PlasmoidItem {
                 Plasmoid.configuration.favoritesPortedToKAstats = true;
             }
         }
+
+        // Categories are rebuilt on every refresh; keep their ordering like stock Kickoff
+        onRefreshed: Nested.applyStockSorting(this)
     }
 
     readonly property Kicker.RunnerModel runnerModel: Kicker.RunnerModel {
