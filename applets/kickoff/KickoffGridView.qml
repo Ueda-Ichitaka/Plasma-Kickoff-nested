@@ -15,6 +15,7 @@ import org.kde.plasma.components as PC3
 import org.kde.plasma.extras as PlasmaExtras
 
 import org.kde.kirigami as Kirigami
+import kickoffnested.kickerparts as KickerParts
 
 // ScrollView makes it difficult to control implicit size using the contentItem.
 // Using EmptyPage instead.
@@ -83,6 +84,16 @@ EmptyPage {
         }
         property bool movedWithKeyboard: false
         property bool movedWithWheel: false
+
+        // Opens Kicker-style flyouts for folder tiles; used by AbstractKickoffItemDelegate
+        readonly property KickerParts.NestedFlyout nestedFlyout: KickerParts.NestedFlyout {
+            view: view
+            onInteractionConcluded: {
+                if (kickoff.hideOnWindowDeactivate) {
+                    kickoff.expanded = false;
+                }
+            }
+        }
 
         // NOTE: parent is the contentItem that Control subclasses automatically
         // create when no contentItem is set, but content is added.

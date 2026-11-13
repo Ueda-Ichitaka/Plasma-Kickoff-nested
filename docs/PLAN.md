@@ -149,12 +149,17 @@ to another folder reached with the mouse, or closes it.
 
 ### 4.5 Flyout placement
 
-- List mode: the flyout opens at the right edge of the row (left edge in RTL),
-  like Kicker's own cascade (`Kicker.SubMenu` positions itself relative to its
-  `visualParent`).
-- Grid mode: `visualParent` is the grid tile; the flyout opens on the side with
-  more free screen space. The side choice is a pure function in
-  `code/nested.js` so it can be unit tested.
+Kicker's `SubMenu::popupPosition()` (plasma-workspace `applets/kicker/submenu.cpp`)
+places a flyout beside its `visualParent`: to the right, to the left when it
+would not fit on the screen (mirrored for RTL), and moved up when it would
+run off the bottom of the screen. Both modes use it unchanged:
+
+- List mode: the flyout opens beside the folder row.
+- Grid mode: the flyout opens beside the folder tile and covers the tiles
+  next to it while open (decided over placing it outside the launcher's
+  edge, which would need an extra anchor helper).
+
+No placement code of our own is needed.
 
 ### 4.6 Build layout
 
@@ -232,7 +237,9 @@ Done when: the widget runs, the smoke test passes, kickerparts loads.
 
 ### Step 5 - Flyouts in grid mode
 
-1. Test first: placement function picks the side with more space; RTL mirrors.
+1. Tests: `tests/tst_nestedflyout.qml` runs the controller on a `GridView`
+   (opens anchored to the tile, hover delay, closing); placement is Kicker's
+   own (4.5).
 2. Wire the controller into `KickoffGridView`.
 3. Manual: tiles at left, middle and right of the grid; screenshot
    `docs/screenshots/grid-flyout.png`.
@@ -309,7 +316,7 @@ executed in a running Plasma session after `makepkg -si` and
 | 2 Nesting on | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
 | 3 Bridge and Kicker parts | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
 | 4 Flyouts in list mode | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
-| 5 Flyouts in grid mode | ❌ |
+| 5 Flyouts in grid mode | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
 | 6 Keyboard | ❌ |
 | 7 Setting and polish | ❌ |
 | 8 Maintenance tooling | ❌ |

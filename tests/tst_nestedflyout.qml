@@ -2,8 +2,8 @@
     About: tests src/NestedFlyout.qml, the controller that opens Kicker-style
     subfolder flyouts from a Kickoff app view. Uses Kicker's real AppsModel
     over the fixed test menu in data/ (Tools holds the Scanners folder and an
-    application), a plain ListView standing in for Kickoff's list view, and
-    the same `kicker` bridge and itemListDialogComponent that Kickoff's
+    application), a plain ListView and GridView standing in for Kickoff's
+    list and grid views, and the same `kicker` bridge and itemListDialogComponent that Kickoff's
     main.qml provides.
 
     SPDX-FileCopyrightText: 2026 Ueda-Ichitaka
@@ -65,6 +65,30 @@ TestCase {
         }
     }
 
+    // Stand-in for KickoffGridView: tiles instead of rows.
+    Component {
+        id: gridComponent
+        GridView {
+            id: gridView
+            property bool movedWithKeyboard: false
+            width: 300
+            height: 500
+            cellWidth: 100
+            cellHeight: 100
+            currentIndex: -1
+            delegate: Text {
+                required property var model
+                required property int index
+                width: 100
+                height: 100
+                text: model.display
+            }
+            readonly property KickerParts.NestedFlyout flyout: KickerParts.NestedFlyout {
+                view: gridView
+            }
+        }
+    }
+
     SignalSpy {
         id: concludedSpy
         signalName: "interactionConcluded"
@@ -120,9 +144,9 @@ TestCase {
         }
     }
 
-    function createView() {
+    function createView(component = viewComponent) {
         verify(mixedModel !== null, "test menu not loaded: no list with both folders and applications");
-        const view = createTemporaryObject(viewComponent, testCase, { model: mixedModel });
+        const view = createTemporaryObject(component, testCase, { model: mixedModel });
         verify(view !== null);
         concludedSpy.target = view.flyout;
         concludedSpy.clear();
@@ -214,5 +238,39 @@ TestCase {
         dialog.interactionConcluded();
         compare(concludedSpy.count, 1);
         compare(view.flyout.childDialog, null);
+    }
+
+    // Grid mode: the flyout is anchored to the folder tile; Kicker's SubMenu
+    // places it beside the tile and flips it at the screen edge.
+    function test_grid_openCurrent_on_folder_opens_flyout_at_tile() {
+        const view = createView(gridComponent);
+        view.currentIndex = folderRow;
+        view.flyout.openCurrent();
+        verify(view.flyout.childDialog !== null);
+        compare(view.flyout.childDialog.model, mixedModel.modelForRow(folderRow));
+        compare(view.flyout.childDialog.visualParent, view.currentItem);
+    }
+
+    function test_grid_hovering_folder_opens_after_delay() {
+        const view = createView(gridComponent);
+        view.currentIndex = folderRow;
+        view.flyout.hoverEntered(folderRow);
+        tryVerify(() => view.flyout.childDialog !== null, 1000);
+    }
+
+    function test_grid_moving_to_app_closes_flyout() {
+        const view = createView(gridComponent);
+        view.currentIndex = folderRow;
+        view.flyout.openCurrent();
+        verify(view.flyout.childDialog !== null);
+        view.currentIndex = appRow;
+        compare(view.flyout.childDialog, null);
+    }
+
+    function test_list_flyout_is_anchored_to_folder_row() {
+        const view = createView();
+        view.currentIndex = folderRow;
+        view.flyout.openCurrent();
+        compare(view.flyout.childDialog.visualParent, view.currentItem);
     }
 }

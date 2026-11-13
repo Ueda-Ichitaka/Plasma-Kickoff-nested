@@ -77,3 +77,24 @@ Settings: applications shown as **list**. Grid mode follows in step 5.
 | 4.11 | Close and reopen the launcher | No flyout left over |
 | 4.12 | Sidebar: hover over categories | No flyout from the sidebar |
 | 4.13 | Journal while doing 4.1 to 4.12 | No errors from `NestedFlyout`, `ItemListDialog` or `KickerBridge` |
+
+## Step 5 - Flyouts in grid mode
+
+Settings: right-click the launcher, **Configure Kickoff Nested...**, show
+applications as **grid**.
+
+| # | Check | Expected |
+|---|---|---|
+| 5.1 | Open the BlackArch category | Folder tiles with a small arrow; no flyout opens by itself |
+| 5.2 | Hover over a folder tile in the left column | Flyout opens beside the tile (to its right), covering the neighbouring tiles |
+| 5.3 | Hover over a folder tile in the right column | Flyout opens beside the tile; if it does not fit on screen, it opens to the left |
+| 5.4 | Click a folder tile | Flyout opens at once |
+| 5.5 | Start a tool from the flyout | Tool starts; flyout and launcher close |
+| 5.6 | Flyout open, move to another folder tile | Flyout switches to that folder |
+| 5.7 | Panel at the bottom of the screen, flyout of a tile in the lowest row | Flyout moves up to stay on screen |
+| 5.8 | Favorites and All Applications in grid mode | Unchanged, no flyouts |
+| 5.9 | Journal while doing 5.1 to 5.8 | No errors from `NestedFlyout` or `ItemListDialog` |
+
+While in steps 4 and 5, please save screenshots for the README:
+`docs/screenshots/list-flyout.png` (list mode, `BlackArch > Scanner` open)
+and `docs/screenshots/grid-flyout.png` (grid mode, flyout from a tile).
