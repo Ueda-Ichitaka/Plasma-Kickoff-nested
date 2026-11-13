@@ -118,3 +118,17 @@ Open the launcher with the Meta key, use only the keyboard.
 | 6.11 | Grid mode: Enter on a folder tile | Flyout opens with first entry selected |
 | 6.12 | Settings: swap sidebar to the right, list mode, Left on a folder | Flyout opens to the left; Right goes to the sidebar |
 | 6.13 | Journal while doing 6.1 to 6.12 | No errors from `NestedFlyout`, `NestedFlyoutDialog` or `ItemListView` |
+
+## Step 7 - Setting and polish
+
+| # | Check | Expected |
+|---|---|---|
+| 7.1 | Right-click the launcher, **Configure Kickoff Nested...** | "Show subfolders" checkbox under General, checked, with a help button |
+| 7.2 | Uncheck "Show subfolders", apply, open BlackArch | Flat list of all BlackArch tools, sorted as in system Kickoff; no arrows, no flyouts |
+| 7.3 | Check it again, apply | Folders and flyouts are back |
+| 7.4 | List mode: open the Scanner flyout, move the mouse diagonally into it across other folder rows | Flyout stays on Scanner |
+| 7.5 | Category with folders and apps (if any): open a flyout, move diagonally into it across an app row | Flyout stays open |
+| 7.6 | Open a flyout, move the mouse onto another folder row and rest there | Flyout switches after a short moment |
+| 7.7 | Open a flyout, move onto an app row and rest there | Flyout closes after a short moment |
+| 7.8 | Open a flyout, press Down in the Kickoff list | Flyout closes at once |
+| 7.9 | Journal while doing 7.1 to 7.8 | No errors |

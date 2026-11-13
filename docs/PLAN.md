@@ -266,10 +266,19 @@ Done when: the widget runs, the smoke test passes, kickerparts loads.
 
 ### Step 7 - Setting and polish
 
-1. Test first: setting off restores `flat: true` behavior.
-2. "Show subfolders" checkbox in `ConfigGeneral.qml`, key in `main.xml`.
-3. Hover blocking on open (Kicker's `HoverBlocker`), no flicker when moving
-   diagonally into a flyout.
+1. Test first: `tests/tst_config.cpp` checks the schema entry
+   `showSubfolders` (Bool, default true) in `applets/kickoff/main.xml`.
+2. "Show subfolders" checkbox in `ConfigGeneral.qml` (with help text); the
+   root model uses `flat: !Plasmoid.configuration.showSubfolders`. Off gives
+   stock Kickoff: no folder rows, so no arrows, no flyouts, and
+   `applyStockSorting` finds nothing to change.
+3. Diagonal moves, test first (`tests/tst_flyout.qml`,
+   `tests/tst_nestedflyout.qml`): a mouse-driven change of the current row
+   while a flyout is open switches or closes it only after the hover delay;
+   entering the flyout (its list's `hovered`) cancels that and makes the
+   flyout's row current again, as Kicker's `ItemListView` does for its
+   parent menu. Keyboard moves close it at once. Hover blocking inside
+   flyouts is Kicker's own `HoverBlocker` in `ItemListDialog`.
 
 ### Step 8 - Maintenance tooling
 
@@ -330,5 +339,5 @@ executed in a running Plasma session after `makepkg -si` and
 | 4 Flyouts in list mode | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
 | 5 Flyouts in grid mode | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
 | 6 Keyboard | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
-| 7 Setting and polish | ❌ |
+| 7 Setting and polish | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
 | 8 Maintenance tooling | ❌ |

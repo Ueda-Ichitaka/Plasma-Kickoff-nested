@@ -201,13 +201,38 @@ TestCase {
         compare(view.flyout.childDialog, null);
     }
 
-    function test_moving_to_app_closes_flyout() {
+    function test_moving_to_app_closes_flyout_after_delay() {
         const view = createView();
         view.currentIndex = folderRow;
         view.flyout.openCurrent();
         verify(view.flyout.childDialog !== null);
         view.currentIndex = appRow;
+        verify(view.flyout.childDialog !== null);
+        tryVerify(() => view.flyout.childDialog === null, 1000);
+    }
+
+    function test_keyboard_move_to_app_closes_flyout_at_once() {
+        const view = createView();
+        view.currentIndex = folderRow;
+        view.flyout.openCurrent();
+        view.movedWithKeyboard = true;
+        view.currentIndex = appRow;
         compare(view.flyout.childDialog, null);
+    }
+
+    // Diagonal move: the mouse crosses another row on its way into the
+    // flyout. Entering the flyout cancels the pending close and makes the
+    // flyout's row current again.
+    function test_entering_flyout_cancels_pending_close_and_restores_row() {
+        const view = createView();
+        view.currentIndex = folderRow;
+        view.flyout.openCurrent();
+        const dialog = view.flyout.childDialog;
+        view.currentIndex = appRow;
+        view.flyout.flyoutHovered();
+        compare(view.currentIndex, folderRow);
+        wait(view.flyout.spawnDelay * 3);
+        compare(view.flyout.childDialog, dialog);
     }
 
     function test_collapsing_launcher_closes_flyout() {
@@ -258,13 +283,13 @@ TestCase {
         tryVerify(() => view.flyout.childDialog !== null, 1000);
     }
 
-    function test_grid_moving_to_app_closes_flyout() {
+    function test_grid_moving_to_app_closes_flyout_after_delay() {
         const view = createView(gridComponent);
         view.currentIndex = folderRow;
         view.flyout.openCurrent();
         verify(view.flyout.childDialog !== null);
         view.currentIndex = appRow;
-        compare(view.flyout.childDialog, null);
+        tryVerify(() => view.flyout.childDialog === null, 1000);
     }
 
     function test_list_flyout_is_anchored_to_folder_row() {

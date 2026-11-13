@@ -57,7 +57,8 @@ PlasmoidItem {
         appletInterface: kickoff
 
         appNameFormat: Plasmoid.configuration.appNameFormat
-        flat: false // have categories with subfolders, shown as Kicker-style flyouts
+        // with subfolders shown, categories keep them; they open as Kicker-style flyouts
+        flat: !Plasmoid.configuration.showSubfolders
         sorted: Plasmoid.configuration.alphaSort
         showSeparators: !sorted && Plasmoid.configuration.applicationsDisplay != 0
         showRootSeparator: true

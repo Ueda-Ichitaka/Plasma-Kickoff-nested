@@ -1,5 +1,6 @@
 # About: automated tests of Kickoff Nested, run with ctest. tst_metadata
-# checks the built applet plugin; the QML tests run with Qt 6's
+# checks the built applet plugin, tst_config the configuration schema
+# (applets/kickoff/main.xml); the QML tests run with Qt 6's
 # qmltestrunner: tst_kickerparts loads the Kicker parts QML module from the
 # build directory, tst_nested tests applets/kickoff/code/nested.js,
 # tst_kickerbridge opens a Kicker flyout through the Kickoff bridge,
@@ -19,6 +20,12 @@ ecm_add_test(tst_metadata.cpp
     LINK_LIBRARIES Qt6::Test KF6::CoreAddons
 )
 target_compile_definitions(tst_metadata PRIVATE APPLET_PLUGIN_FILE="${APPLET_PLUGIN_FILE}")
+
+ecm_add_test(tst_config.cpp
+    TEST_NAME tst_config
+    LINK_LIBRARIES Qt6::Test
+)
+target_compile_definitions(tst_config PRIVATE CONFIG_SCHEMA_FILE="${CMAKE_SOURCE_DIR}/applets/kickoff/main.xml")
 
 find_program(QMLTESTRUNNER qmltestrunner HINTS "${QT6_INSTALL_PREFIX}/${QT6_INSTALL_BINS}" REQUIRED)
 foreach(qml_test tst_kickerparts tst_nested tst_kickerbridge tst_flyout tst_nestedflyout)

@@ -10,8 +10,10 @@
     The first flyout is a NestedFlyoutDialog (Kicker's ItemListDialog with a
     `closing` signal); deeper levels are created by Kicker's own list through
     the `itemListDialogComponent` the applet provides, so they cascade as in
-    Kicker. The flyout closes when the current row is no folder, the view's
-    model changes, or the launcher collapses (`kicker` bridge reset). When it
+    Kicker. When the current row changes by mouse, the flyout switches or
+    closes after `spawnDelay`, and entering the flyout cancels that (diagonal
+    moves); by keyboard it closes at once. It also closes when the view's
+    model changes or the launcher collapses (`kicker` bridge reset). When it
     closes itself (Left inside it), focus returns to the folder row.
     interactionConcluded is forwarded when the user is done inside a flyout
     (application started, Escape, focus left the flyout).
@@ -73,6 +75,11 @@ Item {
             dialog.index = index;
             dialog.interactionConcluded.connect(root.concludeInteraction);
             dialog.closing.connect(() => root.flyoutClosing(dialog));
+            dialog.mainItem.hoveredChanged.connect(() => {
+                if (dialog.mainItem.hovered) {
+                    root.flyoutHovered();
+                }
+            });
             childDialog = dialog;
         }
         if (byKeyboard) {
@@ -119,6 +126,19 @@ Item {
         interactionConcluded();
     }
 
+    // The mouse reached the flyout, possibly across other rows: cancel the
+    // pending switch or close and make the flyout's row current again, as
+    // Kicker's ItemListView does for its parent menu.
+    function flyoutHovered(): void {
+        if (!childDialog) {
+            return;
+        }
+        spawnTimer.stop();
+        if (view.currentIndex !== childDialog.index) {
+            view.currentIndex = childDialog.index;
+        }
+    }
+
     // The flyout destroyed itself (Left in Kicker's list, or its list ran
     // empty). Flyouts closed by close() are no longer childDialog here.
     function flyoutClosing(dialog: var): void {
@@ -148,10 +168,10 @@ Item {
 
         function onCurrentIndexChanged(): void {
             const action = Flyout.actionOnCurrentChange(
-                root.isFolderRow(root.view.currentIndex),
                 root.childDialog !== null,
-                root.view.movedWithKeyboard === true);
-            if (action === Flyout.OpenDelayed) {
+                root.view.movedWithKeyboard === true,
+                root.childDialog !== null && root.view.currentIndex === root.childDialog.index);
+            if (action === Flyout.UpdateDelayed) {
                 spawnTimer.restart();
             } else if (action === Flyout.Close) {
                 root.close();

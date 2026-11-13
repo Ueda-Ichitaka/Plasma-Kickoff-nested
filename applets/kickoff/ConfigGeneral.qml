@@ -33,6 +33,7 @@ KCM.SimpleKCM {
     property int cfg_favoritesDisplay: Plasmoid.configuration.favoritesDisplay
     property int cfg_applicationsDisplay: Plasmoid.configuration.applicationsDisplay
     property alias cfg_alphaSort: alphaSort.checked
+    property alias cfg_showSubfolders: showSubfoldersCheckbox.checked
     property var cfg_systemFavorites: String(Plasmoid.configuration.systemFavorites)
     property int cfg_primaryActions: Plasmoid.configuration.primaryActions
     property alias cfg_showActionButtonCaptions: showActionButtonCaptions.checked
@@ -173,6 +174,18 @@ KCM.SimpleKCM {
 
             Kirigami.ContextualHelpButton {
                 toolTipText: i18nc("@info:whatsthis", "This doesn't affect how applications are sorted in either search results or the favorites page.")
+            }
+        }
+
+        RowLayout {
+            spacing: Kirigami.Units.smallSpacing
+            QQC2.CheckBox {
+                id: showSubfoldersCheckbox
+                text: i18nc("@option:check", "Show subfolders")
+            }
+
+            Kirigami.ContextualHelpButton {
+                toolTipText: i18nc("@info:whatsthis", "Categories show their subfolders, which open as flyouts. When off, all applications of a category are listed together.")
             }
         }
 

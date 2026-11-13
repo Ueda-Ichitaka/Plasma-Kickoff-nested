@@ -53,6 +53,10 @@
             <label>Whether to sort menu contents alphabetically or use manual/system sort order.</label>
             <default>false</default>
         </entry>
+        <entry name="showSubfolders" type="Bool">
+            <label>Whether to show subfolders of categories, opened as flyouts, instead of listing all their applications flat.</label>
+            <default>true</default>
+        </entry>
         <entry name="pin" type="Bool">
             <label>Whether the popup should remain open when another window is activated</label>
             <default>false</default>
