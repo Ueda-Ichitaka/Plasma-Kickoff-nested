@@ -19,8 +19,6 @@ import org.kde.plasma.components as PC3
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.plasmoid
 
-import "code/nested.js" as Nested
-
 AbstractKickoffItemDelegate {
     id: root
 
@@ -135,7 +133,7 @@ AbstractKickoffItemDelegate {
             implicitWidth: visible ? Kirigami.Units.iconSizes.small : 0
             implicitHeight: implicitWidth
 
-            visible: Nested.showsFolderArrow(root.model, root.isCategoryListItem)
+            visible: root.isFlyoutFolder
             opacity: root.view?.currentIndex === root.index ? 1.0 : 0.4
             selected: root.iconAndLabelsShouldlookSelected
             source: root.mirrored ? "go-next-rtl-symbolic" : "go-next-symbolic"

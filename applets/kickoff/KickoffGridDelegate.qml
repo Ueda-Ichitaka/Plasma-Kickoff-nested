@@ -17,8 +17,6 @@ import QtQuick.Layouts
 import org.kde.plasma.components as PC3
 import org.kde.kirigami as Kirigami
 
-import "code/nested.js" as Nested
-
 AbstractKickoffItemDelegate {
     id: root
 
@@ -74,7 +72,7 @@ AbstractKickoffItemDelegate {
                 width: Kirigami.Units.iconSizes.small
                 height: width
 
-                visible: Nested.showsFolderArrow(root.model, root.isCategoryListItem)
+                visible: root.isFlyoutFolder
                 selected: root.iconAndLabelsShouldlookSelected
                 source: root.mirrored ? "go-next-rtl-symbolic" : "go-next-symbolic"
             }

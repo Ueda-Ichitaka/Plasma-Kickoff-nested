@@ -129,10 +129,10 @@ Details: [docs/PLAN.md](docs/PLAN.md).
 ```
 CMakeLists.txt       standalone build of the applet and tests
 cmake/               Kicker parts QML module (kickoffnested.kickerparts)
-src/                 own QML for that module (bridge between Kickoff and Kicker parts)
+src/                 own QML for that module (bridge, flyout controller)
 applets/kickoff/     Kickoff (upstream plasma-desktop, modified)
 applets/kicker/      Kicker (upstream plasma-desktop, subfolder parts reused)
-tests/               ctest tests (C++ and qmltestrunner)
+tests/               ctest tests (C++ and qmltestrunner), fixed test menu in tests/data/
 packaging/PKGBUILD   pacman package, built from the working tree
 docs/                plan, manual test checklist, screenshots
 LICENSES/            license texts referenced by the SPDX headers

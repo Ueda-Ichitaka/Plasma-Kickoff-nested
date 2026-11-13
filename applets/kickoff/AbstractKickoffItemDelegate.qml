@@ -19,6 +19,7 @@ import org.kde.plasma.components as PC3
 import org.kde.plasma.extras as PlasmaExtras
 import org.kde.kirigami as Kirigami
 import "code/tools.js" as Tools
+import "code/nested.js" as Nested
 import org.kde.plasma.plasmoid
 
 T.ItemDelegate {
@@ -44,6 +45,8 @@ T.ItemDelegate {
     property bool removalPlaceholderActive: false
     readonly property bool hasActionList: model && (model.favoriteId !== null || ("hasActionList" in model && model.hasActionList === true))
     property bool isSearchResult: false
+    // Folder in an app view; opens a Kicker-style flyout instead of launching
+    readonly property bool isFlyoutFolder: Nested.showsFolderArrow(model, isCategoryListItem)
 
     readonly property bool isSeparator: model && (model.isSeparator === true)
     property int separatorHeight: KickoffSingleton.lineSvg.horLineHeight + (2 * Kirigami.Units.smallSpacing)
@@ -138,6 +141,10 @@ T.ItemDelegate {
                 return;
             }
             root.view.currentIndex = root.index
+            if (root.isFlyoutFolder && root.view.nestedFlyout) {
+                root.view.nestedFlyout.openCurrent()
+                return;
+            }
             // if successfully triggered, close popup
             if (root.view.model.trigger && root.view.model.trigger(root.index, "", null)) {
                 if (kickoff.hideOnWindowDeactivate) {
@@ -225,6 +232,9 @@ T.ItemDelegate {
             // No need to check currentIndex first because it's
             // built into QQuickListView::setCurrentIndex() already
             root.view.currentIndex = root.index
+            if (root.isFlyoutFolder) {
+                root.view.nestedFlyout?.hoverEntered(root.index)
+            }
         }
         onPressed: mouse => {
             // Select and focus on press to improve responsiveness and touch feedback

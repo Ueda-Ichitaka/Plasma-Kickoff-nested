@@ -1,9 +1,8 @@
 # About: standalone build of Kickoff Nested. Builds the Kickoff applet from
 # applets/kickoff/, Kicker's subfolder components from applets/kicker/ as a
 # separate QML module (cmake/KickerParts.cmake), and the tests, without the
-# rest of plasma-desktop. The
-# version and minimum dependency versions follow the upstream plasma-desktop
-# release this fork is based on.
+# rest of plasma-desktop. The version and minimum dependency versions follow
+# the upstream plasma-desktop release this fork is based on.
 #
 # SPDX-FileCopyrightText: 2026 Ueda-Ichitaka
 # SPDX-License-Identifier: MIT

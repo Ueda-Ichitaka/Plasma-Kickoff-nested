@@ -1,0 +1,8 @@
+# About: test application in the Tools folder of the flyout test menu.
+# SPDX-FileCopyrightText: 2026 Ueda-Ichitaka
+# SPDX-License-Identifier: MIT
+[Desktop Entry]
+Type=Application
+Name=Test Editor
+Exec=true
+Categories=X-KickoffNestedTest-Tools;

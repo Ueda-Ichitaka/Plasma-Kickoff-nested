@@ -134,13 +134,18 @@ without either name fail with "is not defined".
 | `main.qml` | `flat: false`; bridge object; emit `kicker.reset()` on collapse |
 | `metadata.json`, `CMakeLists.txt` | New plugin id and name, so it installs next to the system Kickoff |
 | `KickoffListDelegate.qml`, `KickoffGridDelegate.qml` | Folder arrow or folder badge for rows with `hasChildren` |
-| `AbstractKickoffItemDelegate.qml` | For folder rows: hover timer and click open a flyout instead of `trigger()` |
-| `KickoffListView.qml`, `KickoffGridView.qml` | Own the open flyout (`childDialog`), close it when the current index changes, Right/Enter/Left key handling |
+| `AbstractKickoffItemDelegate.qml` | `isFlyoutFolder`; mouse-enter on a folder calls `nestedFlyout.hoverEntered()`, click/Enter calls `nestedFlyout.openCurrent()` instead of `trigger()` |
+| `KickoffListView.qml`, `KickoffGridView.qml` | Own a `NestedFlyout` (`nestedFlyout`); collapse the launcher when an interaction in a flyout concludes, unless pinned |
 | `ConfigGeneral.qml`, `main.xml` | Setting "Show subfolders" (default on), bound to `flat` |
 
-The flyout opening logic is shared through a new `NestedFlyoutController.qml`
-component used by both views, so the two views stay as close to upstream as
-possible.
+The flyout opening logic lives in `src/NestedFlyout.qml` with its rules in
+`src/flyout.js`, both part of the kickerparts module so they can be tested.
+Each app view owns one `NestedFlyout` (property `nestedFlyout` on its inner
+view); `AbstractKickoffItemDelegate` reports mouse-enter on folders
+(`hoverEntered`) and opens folders on click/Enter (`openCurrent`). A change
+of the current row never opens a flyout by itself, because Kickoff selects the
+first row of every category automatically; it only switches an open flyout
+to another folder reached with the mouse, or closes it.
 
 ### 4.5 Flyout placement
 
@@ -216,9 +221,10 @@ Done when: the widget runs, the smoke test passes, kickerparts loads.
 
 ### Step 4 - Flyouts in list mode
 
-1. Test first: `code/nested.js` decision functions (open on hover after
-   delay, open on click, ignore separators and non-folders) with mock rows.
-2. `NestedFlyoutController.qml`; wire into `KickoffListView` and
+1. Test first: `tests/tst_flyout.qml` (rules in `src/flyout.js`) and
+   `tests/tst_nestedflyout.qml` (`src/NestedFlyout.qml` with Kicker's real
+   `AppsModel` over the fixed test menu in `tests/data/`).
+2. `src/NestedFlyout.qml`; wire into `KickoffListView` and
    `AbstractKickoffItemDelegate`.
 3. Cascading: flyouts open further flyouts (Kicker's own `ItemListView`).
 4. Starting an app from any flyout level closes all flyouts and Kickoff.
@@ -267,9 +273,13 @@ the PATH belongs to Qt 5 (`qt5-declarative`) and cannot load these tests.
   directory's QML import path.
 - Logic that decides behavior lives in `applets/kickoff/code/nested.js`
   (pure functions) and is tested directly.
-- QML components are tested with mock models (`ListModel` rows with
-  `display`, `isParent`, `hasChildren`, `isSeparator`, and a mock
-  `modelForRow`).
+- Pure logic is tested with plain JS mock objects.
+- Components working with Kicker's models (`tst_kickerbridge`,
+  `tst_nestedflyout`) use the real `AppsModel` over a fixed test menu in
+  `tests/data/` (`XDG_MENU_PREFIX=test-`), with their own XDG home, config
+  and cache directories in the build tree. The model's `appletInterface`
+  is cleared after loading, because context-menu actions of application rows
+  dereference the real Plasma applet behind it.
 - `qmllint` over changed files as a gate.
 
 ### Manual
@@ -283,7 +293,7 @@ executed in a running Plasma session after `makepkg -si` and
 
 | Id | Risk / question | Check | Fallback |
 |---|---|---|---|
-| R1 | Kickoff's popup may close when a flyout window takes focus. Kicker's QML does nothing special; the handling is assumed to be in `PlasmaQuick::Dialog` (flyout is a transient child of the popup). | Step 4, first thing | Open folders inside the right pane with a back button instead of flyouts |
+| R1 | Evidence ✅, manual check 4.7 pending: libplasma's `Dialog::focusOutEvent` (v6.8.2, `src/plasmaquick/dialog.cpp`) keeps a popup open while a transient child has focus, and Kicker's `SubMenu` makes itself a transient child of the window it opens from. Kickoff's popup may close when a flyout window takes focus. Kicker's QML does nothing special; the handling is assumed to be in `PlasmaQuick::Dialog` (flyout is a transient child of the popup). | Step 4, first thing | Open folders inside the right pane with a back button instead of flyouts |
 | R2 | ✅ test-level: `tst_kickerparts` resolves `kicker` through the creating context; a copy with the id renamed fails with `kicker is not defined`. Unqualified `kicker` / `itemListDialogComponent` lookups from a second QML module may not resolve through the context chain under `pragma ComponentBehavior: Bound` and compiled QML. | Step 1 test | Copy the Kicker files into Kickoff with explicit properties instead of globals |
 | R3 | ✅ all Kicker parts compile and load as `kickoffnested.kickerparts`. Building Kicker's files outside their original module (`plasma.applet.org.kde.plasma.kicker`) may need adjustments, e.g. `Plasmoid` attached object resolution. | Step 1 | Same as R2 |
 | R4 | Translations: with a new plugin id the translation domain changes, so Kickoff's existing `.mo` files are not used. | Step 1 | Set the domain explicitly to `plasma_applet_org.kde.plasma.kickoff` if libplasma allows it, else English strings |
@@ -298,7 +308,7 @@ executed in a running Plasma session after `makepkg -si` and
 | 1 Build spike | ✅ |
 | 2 Nesting on | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
 | 3 Bridge and Kicker parts | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
-| 4 Flyouts in list mode | ❌ |
+| 4 Flyouts in list mode | automated part ✅, manual checks (docs/MANUAL-TESTS.md) pending |
 | 5 Flyouts in grid mode | ❌ |
 | 6 Keyboard | ❌ |
 | 7 Setting and polish | ❌ |

@@ -1,0 +1,27 @@
+<!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
+"http://www.freedesktop.org/standards/menu-spec/menu-1.0.dtd">
+<!--
+    About: fixed test menu for the flyout tests (XDG_MENU_PREFIX=test-).
+    Tools holds a subfolder (Scanners) and an application, so one list has
+    both folders and applications, independent of the installed menu.
+
+    SPDX-FileCopyrightText: 2026 Ueda-Ichitaka
+    SPDX-License-Identifier: MIT
+-->
+<Menu>
+    <Name>Applications</Name>
+    <DefaultAppDirs/>
+    <DefaultDirectoryDirs/>
+    <Menu>
+        <Name>Tools</Name>
+        <Include>
+            <Category>X-KickoffNestedTest-Tools</Category>
+        </Include>
+        <Menu>
+            <Name>Scanners</Name>
+            <Include>
+                <Category>X-KickoffNestedTest-Scanners</Category>
+            </Include>
+        </Menu>
+    </Menu>
+</Menu>
